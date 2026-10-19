@@ -129,3 +129,25 @@
     @apply font-sans;
   }
 }
+
+@media print {
+  html,
+  body {
+    background: #fff !important;
+    color: #111 !important;
+    display: block !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+  article {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  article h2 {
+    break-after: avoid;
+  }
+  article section > div,
+  article li {
+    break-inside: avoid;
+  }
+}

@@ -17,7 +17,7 @@ export function AppHeader() {
   }
 
   return (
-    <header className="border-border border-b">
+    <header className="border-border border-b print:hidden">
       <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between gap-3 px-5 sm:px-10">
         <Link
           href="/dashboard"

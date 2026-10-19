@@ -18,6 +18,8 @@ import {
 } from "@/lib/resume/schema";
 import { cn } from "@/lib/utils";
 import { ContentForm } from "./content-form";
+import { PrintSheet } from "./print-sheet";
+import { SectionControls } from "./section-controls";
 import { Preview } from "./preview";
 import { useAutosave } from "./use-autosave";
 
@@ -90,108 +92,130 @@ function Editor({ initial }: { initial: Resume }) {
   }
 
   return (
-    <div>
-      <div className="flex flex-wrap items-center gap-3">
-        <Link
-          href="/dashboard"
-          className={buttonVariants({ variant: "ghost", size: "sm" })}
-        >
-          ← Resumes
-        </Link>
-        <Input
-          aria-label="Resume title"
-          className="max-w-xs"
-          value={titleText}
-          maxLength={128}
-          onChange={(e) => onTitle(e.target.value)}
-          onBlur={() => setTitleText(doc.title)}
-        />
-        <select
-          aria-label="Template"
-          className={SELECT}
-          value={doc.templateId}
-          onChange={(e) =>
-            setDoc((d) => ({
-              ...d,
-              templateId: templateIdSchema.parse(e.target.value),
-            }))
-          }
-        >
-          {TEMPLATE_IDS.map((t) => (
-            <option key={t} value={t}>
-              {TEMPLATE_LABEL[t]}
-            </option>
-          ))}
-        </select>
-        <select
-          aria-label="Page size"
-          className={SELECT}
-          value={doc.pageSize}
-          onChange={(e) =>
-            setDoc((d) => ({
-              ...d,
-              pageSize: pageSizeSchema.parse(e.target.value),
-            }))
-          }
-        >
-          {PAGE_SIZES.map((p) => (
-            <option key={p} value={p}>
-              {PAGE_LABEL[p]}
-            </option>
-          ))}
-        </select>
-        <p
-          role="status"
-          aria-live="polite"
-          className="text-muted-foreground ml-auto text-sm"
-        >
-          {statusText(status, error)}
-        </p>
-      </div>
-
-      <div className="mt-4 flex gap-2 lg:hidden">
-        <Button
-          type="button"
-          size="sm"
-          variant={tab === "edit" ? "default" : "outline"}
-          aria-pressed={tab === "edit"}
-          onClick={() => setTab("edit")}
-        >
-          Edit
-        </Button>
-        <Button
-          type="button"
-          size="sm"
-          variant={tab === "preview" ? "default" : "outline"}
-          aria-pressed={tab === "preview"}
-          onClick={() => setTab("preview")}
-        >
-          Preview
-        </Button>
-      </div>
-
-      <div className="mt-6 grid gap-8 lg:grid-cols-2">
-        <div className={cn(tab !== "edit" && "hidden lg:block")}>
-          <ContentForm
-            content={doc.content}
-            onChange={(content) => setDoc((d) => ({ ...d, content }))}
+    <>
+      <div className="print:hidden">
+        <div className="flex flex-wrap items-center gap-3">
+          <Link
+            href="/dashboard"
+            className={buttonVariants({ variant: "ghost", size: "sm" })}
+          >
+            ← Resumes
+          </Link>
+          <Input
+            aria-label="Resume title"
+            className="max-w-xs"
+            value={titleText}
+            maxLength={128}
+            onChange={(e) => onTitle(e.target.value)}
+            onBlur={() => setTitleText(doc.title)}
           />
+          <select
+            aria-label="Template"
+            className={SELECT}
+            value={doc.templateId}
+            onChange={(e) =>
+              setDoc((d) => ({
+                ...d,
+                templateId: templateIdSchema.parse(e.target.value),
+              }))
+            }
+          >
+            {TEMPLATE_IDS.map((t) => (
+              <option key={t} value={t}>
+                {TEMPLATE_LABEL[t]}
+              </option>
+            ))}
+          </select>
+          <select
+            aria-label="Page size"
+            className={SELECT}
+            value={doc.pageSize}
+            onChange={(e) =>
+              setDoc((d) => ({
+                ...d,
+                pageSize: pageSizeSchema.parse(e.target.value),
+              }))
+            }
+          >
+            {PAGE_SIZES.map((p) => (
+              <option key={p} value={p}>
+                {PAGE_LABEL[p]}
+              </option>
+            ))}
+          </select>
+          <p
+            role="status"
+            aria-live="polite"
+            className="text-muted-foreground ml-auto text-sm"
+          >
+            {statusText(status, error)}
+          </p>
+          <Button
+            type="button"
+            size="sm"
+            onClick={() => window.print()}
+            title="Opens the print dialog. Choose Save as PDF."
+          >
+            Download PDF
+          </Button>
         </div>
-        <div
-          className={cn(
-            "lg:sticky lg:top-6 lg:self-start",
-            tab !== "preview" && "hidden lg:block",
-          )}
-        >
-          <Preview
-            content={doc.content}
-            layout={doc.layout}
-            templateId={doc.templateId}
-            pageSize={doc.pageSize}
-          />
+
+        <div className="mt-4 flex gap-2 lg:hidden">
+          <Button
+            type="button"
+            size="sm"
+            variant={tab === "edit" ? "default" : "outline"}
+            aria-pressed={tab === "edit"}
+            onClick={() => setTab("edit")}
+          >
+            Edit
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant={tab === "preview" ? "default" : "outline"}
+            aria-pressed={tab === "preview"}
+            onClick={() => setTab("preview")}
+          >
+            Preview
+          </Button>
+        </div>
+
+        <div className="mt-6 grid gap-8 lg:grid-cols-2">
+          <div className={cn(tab !== "edit" && "hidden lg:block")}>
+            <div className="grid gap-8">
+              <SectionControls
+                layout={doc.layout}
+                onChange={(layout) => setDoc((d) => ({ ...d, layout }))}
+              />
+              <ContentForm
+                content={doc.content}
+                onChange={(content) => setDoc((d) => ({ ...d, content }))}
+              />
+            </div>
+          </div>
+          <div
+            className={cn(
+              "lg:sticky lg:top-6 lg:self-start",
+              tab !== "preview" && "hidden lg:block",
+            )}
+          >
+            <Preview
+              content={doc.content}
+              layout={doc.layout}
+              templateId={doc.templateId}
+              pageSize={doc.pageSize}
+            />
+          </div>
         </div>
       </div>
-    </div>
+      <PrintSheet
+        content={doc.content}
+        layout={doc.layout}
+        templateId={doc.templateId}
+        pageSize={doc.pageSize}
+      />
+    </>
   );
 }
 
